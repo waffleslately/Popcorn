@@ -1,11 +1,14 @@
 # 🍿 Popcorn — Synchronized Cinema Watch-Party
 
-Watch movies together in perfect sync — silhouette seating, spoiler-safe chat, group polls, and a full discovery lobby backed by TMDB.
+**Watch together, in sync, from anywhere.** Popcorn is a real-time watch-party app where friends gather in a virtual cinema: everyone sits in a shared theater under the screen, reactions float up from their seats, and the house lights dim when the film starts.
+
+> **Status:** in development, built in phases. See the [roadmap](#roadmap).
 
 ---
 
 ## Table of Contents
 
+- [Highlights](#highlights)
 - [Features](#features)
 - [Architecture](#architecture)
 - [Prerequisites](#prerequisites)
@@ -14,24 +17,52 @@ Watch movies together in perfect sync — silhouette seating, spoiler-safe chat,
 - [Desktop App](#desktop-app)
 - [Testing](#testing)
 - [Load Test](#load-test)
+- [Roadmap](#roadmap)
 - [Design Decisions](#design-decisions)
 - [Environment Variables](#environment-variables)
+- [Responsible Use](#responsible-use)
+
+---
+
+## Highlights
+
+- **Join in seconds.** Share a 6-character code, an invite link or a QR code. Guests only need a nickname.
+- **Rock-solid sync.** Play, pause and seek stay aligned across everyone, with the server as the single source of truth.
+- **Cinema feel.** A theater view with seated members, rising emoji reactions and dimming house lights.
+- **Spoiler-safe chat.** Messages and reactions are stamped with video time, so late joiners and rewinders never see the future.
+- **Pick what to watch.** Browse by genre, year, rating and language, fuzzy-search titles, build a shared playlist and settle it with group polls or elimination brackets.
 
 ---
 
 ## Features
 
-| Feature | Details |
-|---|---|
-| 🎬 **Synced Playback** | YouTube IFrame + HTML5/HLS adapters; clock-sync within 50 ms p95 |
-| 🪑 **Theater Seating** | Up to 50 silhouette seats; whisper bubbles float on active chat |
-| 💬 **Spoiler-safe Chat** | Messages tagged with video timecode; blur-reveal past your position |
-| 🎭 **Reactions** | 6 emoji reactions burst-animate over the theater |
-| 🎞️ **Discovery Lobby** | TMDB-backed search + genre nav; curated fallback cinema if no API key |
-| 📋 **Playlist Queue** | Majority-skip voting; host auto-advances to next item |
-| 🗳️ **Group Polls** | Single-choice + elimination-bracket polls with live % bars |
-| 🖥️ **Desktop App** | Electron wrapper for an always-on-top native window |
-| ⚡ **Load Tested** | p95 propagation 3 ms @ 50 clients; drift correction < 500 ms |
+### Rooms and presence
+- Invite link, 6-character code or QR join
+- Late joins catch up to the current position automatically
+- Reconnects keep your seat through a grace window
+- Host transfer, manual or automatic when the host drops
+
+### Synced playback
+- Server-authoritative play, pause and seek
+- Concurrent control actions resolved by sequence number
+- Per-client clock-offset estimation, plus drift detection and gentle correction
+- YouTube IFrame + HTML5/HLS adapters; clock-sync within 50 ms p95
+
+### Social
+- Live chat and emoji reactions, both stamped with video time
+- Shared playlist and group polls, including elimination brackets
+- 6 emoji reactions burst-animate over the theater
+- Whisper bubbles float on active chat
+
+### Discovery
+- Filters for genre, year, rating and language
+- Fuzzy search powered by Fuse.js
+- TMDB-backed search + curated fallback cinema if no API key
+
+### Reliability
+- Load test and latency report in [`docs/LATENCY.md`](docs/LATENCY.md)
+- Grace-window eviction and host succession logic in the server
+- p95 propagation 3 ms @ 50 clients; drift correction < 500 ms
 
 ---
 
@@ -70,6 +101,8 @@ Every client runs a PLL-style clock synchronisation loop:
    - `|drift| ≤ 80 ms` → rate nudge (playbackRate 0.92–1.08)
    - `|drift| > 80 ms` → hard seek to `targetPosition()`
 5. **Scheduled execution** — `applyPlayback()` uses `msUntil(effectiveAt)` to schedule play/pause at the exact server timestamp.
+
+Sync logic lives in `packages/shared` as pure functions, so the client and server run identical code and it can be tested without a network.
 
 ---
 
@@ -194,6 +227,20 @@ All well within targets: propagation < 250 ms, drift < 500 ms.
 
 ---
 
+## Roadmap
+
+- [ ] **0. Foundations:** scaffold and sync unit tests
+- [ ] **1. Rooms:** presence, reconnect, host transfer
+- [ ] **2. Playback:** synced playback and drift correction
+- [ ] **3. Social:** chat and reactions
+- [ ] **4. Discovery:** search, playlist, polls
+- [ ] **5. Performance:** load test and latency report
+- [ ] **6. Theater:** seating, reaction heatmap, health panel
+- [ ] **7. Diary:** watch log and ratings
+- [ ] **8. Sources:** file upload, host-stream and external sources
+
+---
+
 ## Design Decisions
 
 ### Design Token System (`tokens.css`)
@@ -238,6 +285,20 @@ Copy `.env.example` to `apps/server/.env` to get started.
 
 ---
 
+## Responsible Use
+
+Only share content you have the right to share. Demos use YouTube, open-licensed films or your own files.
+
+---
+
+## Acknowledgements
+
+This product uses the TMDB API but is not endorsed or certified by TMDB.
+
+---
+
 ## License
 
 MIT — watch responsibly 🍿
+a
+
