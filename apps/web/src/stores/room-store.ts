@@ -7,6 +7,7 @@ import {
   type Member,
   type PlaybackState,
   type Reaction,
+  type ReactionKind,
   type RoomSnapshot,
   type Source,
 } from '@popcorn/shared';
@@ -18,6 +19,7 @@ interface RoomState {
   token: string;
   snapshot: RoomSnapshot | null;
   error: string | null;
+  isConnecting: boolean;
   activeReactions: Reaction[];
   activeWhispers: Array<{ id: string; memberId: string; text: string }>;
 

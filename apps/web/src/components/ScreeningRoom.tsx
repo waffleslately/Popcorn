@@ -3,8 +3,11 @@ import { useRoomStore } from '../stores/room-store';
 import { Theater } from './Theater';
 import { CinemaPlayer } from './CinemaPlayer';
 import { ChatDrawer } from './ChatDrawer';
-import { getServerOffset } from '../lib/socket';
-import { targetPosition, toServerTime, type Member, type ReactionKind } from '@popcorn/shared';
+import { Lobby } from './Lobby';
+import { PlaylistDrawer } from './PlaylistDrawer';
+import { PollsDrawer } from './PollsDrawer';
+import { getServerOffset, socket } from '../lib/socket';
+import { targetPosition, toServerTime, type Member, type ReactionKind, type Source } from '@popcorn/shared';
 import './ScreeningRoom.css';
 
 interface ScreeningRoomProps {
@@ -27,6 +30,7 @@ export function ScreeningRoom({ onBackToBoxOffice }: ScreeningRoomProps) {
     setControlMode,
     sendControl,
     leaveRoom,
+    changeSource,
     sendReaction,
     activeReactions,
     activeWhispers,
@@ -35,12 +39,19 @@ export function ScreeningRoom({ onBackToBoxOffice }: ScreeningRoomProps) {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [isAwake, setIsAwake] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isLobbyOpen, setIsLobbyOpen] = useState(false);
+  const [isPlaylistOpen, setIsPlaylistOpen] = useState(false);
+  const [isPollsOpen, setIsPollsOpen] = useState(false);
   const [currentVideoTime, setCurrentVideoTime] = useState(0);
 
   const youId = snapshot?.you || '';
   const isHost = snapshot?.hostId === youId;
   const isPlaying = snapshot?.playback?.status === 'playing';
   const controlAllowed = isHost || snapshot?.controlMode === 'everyone';
+
+  const handleAddToPlaylist = (source: Source) => {
+    socket.emit('playlist:add', { source });
+  };
 
   // Track estimated current video time
   useEffect(() => {
@@ -132,6 +143,27 @@ export function ScreeningRoom({ onBackToBoxOffice }: ScreeningRoomProps) {
         </div>
 
         <div className="screening-header-right">
+          <button
+            type="button"
+            className={`btn btn-secondary btn-sm ${isLobbyOpen ? 'btn-brass' : ''}`}
+            onClick={() => setIsLobbyOpen(true)}
+          >
+            Lobby
+          </button>
+          <button
+            type="button"
+            className={`btn btn-secondary btn-sm ${isPlaylistOpen ? 'btn-brass' : ''}`}
+            onClick={() => setIsPlaylistOpen(!isPlaylistOpen)}
+          >
+            Queue ({snapshot.playlist.length})
+          </button>
+          <button
+            type="button"
+            className={`btn btn-secondary btn-sm ${isPollsOpen ? 'btn-brass' : ''}`}
+            onClick={() => setIsPollsOpen(!isPollsOpen)}
+          >
+            Polls ({snapshot.polls.length})
+          </button>
           <button
             type="button"
             className={`btn btn-secondary btn-sm ${isChatOpen ? 'btn-brass' : ''}`}
@@ -233,6 +265,39 @@ export function ScreeningRoom({ onBackToBoxOffice }: ScreeningRoomProps) {
         isOpen={isChatOpen}
         onClose={() => setIsChatOpen(false)}
       />
+
+      {/* Playlist Queue Drawer */}
+      <PlaylistDrawer
+        playlist={snapshot.playlist}
+        members={snapshot.members}
+        isOpen={isPlaylistOpen}
+        onClose={() => setIsPlaylistOpen(false)}
+        onOpenLobby={() => {
+          setIsPlaylistOpen(false);
+          setIsLobbyOpen(true);
+        }}
+      />
+
+      {/* Polls Drawer */}
+      <PollsDrawer
+        polls={snapshot.polls}
+        isOpen={isPollsOpen}
+        onClose={() => setIsPollsOpen(false)}
+      />
+
+      {/* Discovery Lobby Overlay */}
+      {isLobbyOpen && (
+        <Lobby
+          onSelectMovie={(source) => {
+            changeSource(source);
+            setIsLobbyOpen(false);
+          }}
+          onAddToPlaylist={(source) => {
+            handleAddToPlaylist(source);
+          }}
+          onClose={() => setIsLobbyOpen(false)}
+        />
+      )}
 
       {/* Member Details / Host Transfer Drawer */}
       {selectedMember && (

@@ -1,0 +1,235 @@
+.polls-drawer {
+  position: fixed;
+  top: 0;
+  right: -340px;
+  width: 320px;
+  height: 100vh;
+  background: #0f0d14;
+  border-left: 1px solid rgba(237, 241, 245, 0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 60;
+  transition: right var(--d-base) var(--ease);
+  box-sizing: border-box;
+}
+
+.polls-drawer--open {
+  right: 0;
+}
+
+.polls-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--s-4);
+  border-bottom: 1px solid rgba(237, 241, 245, 0.08);
+}
+
+.polls-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.polls-title {
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  font-weight: 800;
+  color: var(--beam);
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.polls-count {
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  background: var(--kernel);
+  color: var(--pit);
+  padding: 1px 6px;
+  font-weight: 700;
+}
+
+.polls-close {
+  background: transparent;
+  border: none;
+  color: var(--beam);
+  font-size: var(--t-md);
+  cursor: pointer;
+}
+
+.polls-actions-bar {
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid rgba(237, 241, 245, 0.05);
+}
+
+.polls-create-form {
+  padding: var(--s-4);
+  background: var(--velvet);
+  border-bottom: 1px solid var(--brass);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.polls-input,
+.polls-select {
+  width: 100%;
+  background: var(--pit);
+  border: 1px solid rgba(237, 241, 245, 0.2);
+  color: var(--beam);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  padding: var(--s-2);
+  border-radius: var(--r-cut);
+  box-sizing: border-box;
+}
+
+.options-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.btn-add-option {
+  background: transparent;
+  border: 1px dashed rgba(237, 241, 245, 0.3);
+  color: var(--beam);
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  padding: var(--s-1);
+  cursor: pointer;
+}
+
+.polls-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.polls-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: #776a74;
+  text-align: center;
+  gap: var(--s-1);
+}
+
+.polls-empty-sub {
+  font-size: var(--t-xs);
+  color: #554a52;
+}
+
+.poll-card {
+  background: var(--pit);
+  border: 1px solid rgba(237, 241, 245, 0.1);
+  padding: var(--s-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.poll-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.poll-kind-badge {
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: var(--brass);
+  font-weight: 700;
+}
+
+.poll-status-tag {
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: var(--kernel);
+}
+
+.poll-status--closed {
+  color: #887a84;
+}
+
+.poll-question {
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--beam);
+  margin: 0;
+}
+
+.poll-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin-top: var(--s-1);
+}
+
+.poll-option-btn {
+  position: relative;
+  background: #14121a;
+  border: 1px solid rgba(237, 241, 245, 0.1);
+  padding: var(--s-2) var(--s-3);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: var(--r-cut);
+}
+
+.poll-option-btn:disabled {
+  cursor: default;
+}
+
+.poll-option-btn--voted {
+  border-color: var(--brass);
+}
+
+.poll-option-btn--eliminated {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+
+.poll-option-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(184, 138, 62, 0.2);
+  transition: width var(--d-base) var(--ease);
+}
+
+.poll-option-content {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: var(--beam);
+}
+
+.poll-option-stats {
+  font-variant-numeric: var(--tnum);
+  color: var(--kernel);
+}
+
+.poll-host-actions {
+  margin-top: var(--s-2);
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 480px) {
+  .polls-drawer {
+    width: 100vw;
+    right: -100vw;
+  }
+}

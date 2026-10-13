@@ -13,6 +13,7 @@
     "desktop": "npm run dev --workspace=@popcorn/desktop",
     "build": "npm run build --workspace=@popcorn/shared && npm run build --workspace=@popcorn/server && npm run build --workspace=@popcorn/web && npm run build --workspace=@popcorn/desktop",
     "test": "vitest run",
+    "loadtest": "npx tsx scripts/loadtest.ts",
     "lint": "tsc --noEmit --project packages/shared/tsconfig.json && tsc --noEmit --project apps/server/tsconfig.json && tsc --noEmit --project apps/web/tsconfig.json"
   },
   "devDependencies": {
