@@ -1,0 +1,287 @@
+.boxoffice-root {
+  min-height: 100vh;
+  background: var(--velvet-deep);
+  color: var(--beam);
+  padding: var(--s-8) var(--s-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.boxoffice-header {
+  text-align: center;
+  margin-bottom: var(--s-8);
+  max-width: 600px;
+}
+
+.boxoffice-title {
+  font-family: var(--font-display);
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  color: var(--beam);
+  letter-spacing: 2px;
+  margin: 0 0 var(--s-2) 0;
+  text-transform: uppercase;
+}
+
+.boxoffice-subtitle {
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  color: var(--kernel);
+  margin: 0;
+}
+
+.boxoffice-error {
+  max-width: 500px;
+  width: 100%;
+  padding: var(--s-3) var(--s-4);
+  background: var(--velvet);
+  border: 1px solid var(--brass);
+  color: var(--beam);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  margin-bottom: var(--s-6);
+  border-radius: var(--r-cut);
+}
+
+.boxoffice-grid {
+  display: grid;
+  grid-template-columns: 320px 320px;
+  gap: var(--s-8);
+  max-width: 720px;
+  width: 100%;
+  align-items: start;
+}
+
+/* Ticket Stub */
+.boxoffice-ticket {
+  padding: var(--s-6) var(--s-6);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 380px;
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed var(--ink);
+  padding-bottom: var(--s-3);
+  margin-bottom: var(--s-4);
+}
+
+.ticket-cinema-brand {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--t-md);
+  letter-spacing: 1px;
+}
+
+.ticket-admit {
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  border: 1px solid var(--ink);
+  padding: 2px 6px;
+}
+
+.ticket-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  flex-grow: 1;
+}
+
+.ticket-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-label {
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: #55444e;
+  text-transform: uppercase;
+}
+
+.ticket-code {
+  font-family: var(--font-display);
+  font-size: var(--t-xl);
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--velvet);
+}
+
+.ticket-movie {
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ticket-seats {
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  font-variant-numeric: var(--tnum);
+  color: var(--ink);
+}
+
+.ticket-footer {
+  border-top: 2px dashed var(--ink);
+  padding-top: var(--s-4);
+  margin-top: var(--s-4);
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.ticket-qr {
+  width: 72px;
+  height: 72px;
+  display: block;
+}
+
+.ticket-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.ticket-copy-btn {
+  background: var(--ink);
+  color: var(--beam);
+  border: none;
+  padding: var(--s-2) var(--s-3);
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  cursor: pointer;
+  border-radius: var(--r-cut);
+  transition: background var(--d-fast) var(--ease);
+}
+
+.ticket-copy-btn:hover {
+  background: var(--velvet-deep);
+}
+
+/* Controls */
+.boxoffice-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+.boxoffice-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  background: var(--velvet);
+  padding: var(--s-6);
+  border: 1px solid rgba(237, 241, 245, 0.1);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
+
+.form-label {
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: var(--beam);
+}
+
+.form-input {
+  background: var(--pit);
+  border: 1px solid var(--brass);
+  color: var(--beam);
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  padding: var(--s-3) var(--s-4);
+  outline: none;
+  border-radius: var(--r-cut);
+}
+
+.form-input:focus {
+  border-color: var(--kernel);
+}
+
+.form-input-code {
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  letter-spacing: 2px;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-top: var(--s-2);
+}
+
+.btn {
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  font-weight: 700;
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-cut);
+  border: none;
+  cursor: pointer;
+  transition: all var(--d-fast) var(--ease);
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--beam);
+  color: var(--velvet-deep);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--kernel);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--beam);
+  border: 1px solid var(--beam);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(237, 241, 245, 0.1);
+}
+
+.btn-brass {
+  background: var(--brass);
+  color: var(--pit);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.boxoffice-resume {
+  background: var(--pit);
+  padding: var(--s-4);
+  border: 1px solid var(--brass);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.resume-text {
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: var(--beam);
+  margin: 0;
+}
+
+/* Responsive to 390px */
+@media (max-width: 720px) {
+  .boxoffice-grid {
+    grid-template-columns: 1fr;
+    max-width: 360px;
+  }
+}

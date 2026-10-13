@@ -1,0 +1,83 @@
+/* Popcorn design tokens. Load fonts in index.html:
+   https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Schibsted+Grotesk:wght@400;500;700&display=swap
+   Give both a real fallback stack. */
+
+:root {
+  /* Palette: a cinema, not a SaaS dashboard */
+  --velvet: #6b1d2a;       /* seat red: lobby wall, own-seat accent */
+  --velvet-deep: #3f0f19;  /* lobby depth, pressed states */
+  --pit: #0d0c11;          /* screening room: dark because it is a screening room */
+  --beam: #edf1f5;         /* projector white: text on dark, paper in the diary */
+  --brass: #b88a3e;        /* rails, focus rings, own-seat rim light */
+  --kernel: #f2d16b;       /* butter yellow: reactions and the pop motif only */
+  --ink: #1a1418;          /* text on beam paper */
+
+  /* Type */
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif; /* titles, room codes, marquee */
+  --font-body: 'Schibsted Grotesk', system-ui, sans-serif;
+  --tnum: tabular-nums;    /* timecodes use body font + tabular figures, no mono face */
+
+  /* Scale (1.25) with deliberate jumps for display */
+  --t-xs: 0.8rem;
+  --t-sm: 0.9rem;
+  --t-md: 1rem;
+  --t-lg: 1.25rem;
+  --t-xl: 1.953rem;
+  --t-display: clamp(3rem, 9vw, 7.5rem);
+  --lh-body: 1.5;
+  --lh-display: 0.9;
+
+  /* Space: 4px base, used unevenly on purpose */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-6: 24px; --s-8: 32px; --s-12: 48px; --s-16: 64px;
+
+  /* Only two shapes exist: square-cut (tickets, panels) and round (seats, avatars) */
+  --r-cut: 0;
+  --r-round: 999px;
+  --ticket-notch: 10px;    /* semicircle notch size on ticket stubs */
+
+  /* Light is the only "shadow" in the system */
+  --beam-glow: 0 0 80px 10px color-mix(in srgb, var(--beam) 14%, transparent);
+  --rim-light: 0 0 0 2px var(--brass);
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --d-fast: 140ms;
+  --d-base: 260ms;
+  --d-lights: 1200ms;      /* house lights dimming */
+
+  /* House lights: 1 = lights up (paused / lobby), 0.12 = lights down (playing) */
+  --lights: 1;
+}
+
+/* One orchestrated moment: when the film plays, all chrome dims. Set data-lights on the room root. */
+[data-lights='down'] { --lights: 0.12; }
+[data-lights='up'] { --lights: 1; }
+
+.chrome {
+  opacity: var(--lights);
+  transition: opacity var(--d-lights) var(--ease);
+}
+.chrome:hover,
+.chrome:focus-within,
+[data-awake='true'] .chrome { opacity: 1; transition-duration: var(--d-base); } /* pointer movement wakes the UI */
+
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --d-fast: 0ms; --d-base: 0ms; --d-lights: 0ms; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* Ticket stub shape: perforated notches cut from the sides. Use for the room code and each seat's reaction tag. */
+.ticket {
+  --n: var(--ticket-notch);
+  background: var(--beam);
+  color: var(--ink);
+  -webkit-mask:
+    radial-gradient(circle var(--n) at 0 50%, #0000 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--n) at 100% 50%, #0000 98%, #000) right / 51% 100% no-repeat;
+          mask:
+    radial-gradient(circle var(--n) at 0 50%, #0000 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--n) at 100% 50%, #0000 98%, #000) right / 51% 100% no-repeat;
+}

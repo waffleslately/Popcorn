@@ -1,0 +1,215 @@
+.theater-container {
+  position: relative;
+  width: 100%;
+  padding: var(--s-6) var(--s-4);
+  background: var(--pit);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.theater-screen-glow {
+  width: 70%;
+  height: 8px;
+  background: var(--beam);
+  border-radius: var(--r-round);
+  box-shadow: var(--beam-glow);
+  margin-bottom: var(--s-6);
+  opacity: 0.8;
+}
+
+.theater-rows {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s-4) var(--s-3);
+  max-width: 900px;
+  width: 100%;
+}
+
+.theater-seat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 64px;
+  cursor: pointer;
+  outline: none;
+  transition: transform var(--d-fast) var(--ease);
+}
+
+.theater-seat:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
+}
+
+.theater-seat:hover {
+  transform: translateY(-2px);
+}
+
+/* Head & shoulders silhouette */
+.seat-silhouette {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-round);
+  background: var(--velvet-deep);
+  color: #240b10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--d-base) var(--ease);
+}
+
+.seat-head-svg {
+  width: 36px;
+  height: 36px;
+}
+
+/* Own seat rim light */
+.theater-seat--you .seat-silhouette {
+  box-shadow: var(--rim-light);
+  background: var(--velvet);
+  color: #1a060b;
+}
+
+/* Disconnected seat */
+.theater-seat--disconnected {
+  opacity: 0.45;
+}
+
+/* Seat tag */
+.seat-tag {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  margin-top: var(--s-1);
+  max-width: 64px;
+}
+
+.seat-name {
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: var(--beam);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.seat-host-badge {
+  color: var(--brass);
+  font-size: var(--t-xs);
+}
+
+.seat-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-round);
+  background: var(--kernel);
+  display: inline-block;
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Reactions rising from the seat */
+.seat-reactions-anchor {
+  position: absolute;
+  top: -10px;
+  pointer-events: none;
+}
+
+.seat-reaction-bubble {
+  position: absolute;
+  font-size: var(--t-lg);
+  animation: reaction-rise 3.2s var(--ease-spring) forwards;
+  will-change: transform, opacity;
+}
+
+.seat-whisper-bubble {
+  position: absolute;
+  bottom: 10px;
+  background: var(--beam);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  padding: 3px 8px;
+  border-radius: var(--r-cut);
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  animation: whisper-float 3.6s var(--ease) forwards;
+  z-index: 10;
+}
+
+@keyframes whisper-float {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    transform: translateY(-20px) scale(1);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-35px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+@keyframes reaction-rise {
+  0% {
+    transform: translateY(0) scale(0.6);
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(-30px) scale(1.2);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-70px) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-90px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Responsive to 390px (collapses to a single scrollable row of heads) */
+@media (max-width: 480px) {
+  .theater-rows {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: var(--s-2);
+    max-width: 100%;
+    scrollbar-width: thin;
+  }
+
+  .theater-seat {
+    flex-shrink: 0;
+    width: 52px;
+  }
+
+  .seat-silhouette {
+    width: 38px;
+    height: 38px;
+  }
+
+  .seat-head-svg {
+    width: 30px;
+    height: 30px;
+  }
+}

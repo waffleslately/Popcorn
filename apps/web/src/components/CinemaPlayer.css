@@ -1,0 +1,51 @@
+.cinema-player-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.player-yt-container,
+.player-video-element {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.player-empty-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #060508;
+}
+
+.player-curtain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.player-slate-text {
+  font-family: var(--font-display);
+  font-size: var(--t-xl);
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--beam);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.player-slate-sub {
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: var(--kernel);
+  margin: 0;
+}
