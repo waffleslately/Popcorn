@@ -22,7 +22,11 @@ export function BoxOffice({ initialCode = '', onEnterRoom }: BoxOfficeProps) {
   } = useRoomStore();
 
   const [inputCode, setInputCode] = useState(initialCode || storeCode);
-  const [inputNick, setInputNick] = useState(nickname || '');
+  const [inputNick, setInputNick] = useState(
+    nickname || (() => {
+      try { return localStorage.getItem('popcorn_saved_nick') || ''; } catch { return ''; }
+    })()
+  );
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copyFeedback, setCopyFeedback] = useState<string>('');
   const [roomInfo, setRoomInfo] = useState<{
@@ -68,22 +72,25 @@ export function BoxOffice({ initialCode = '', onEnterRoom }: BoxOfficeProps) {
   }, [activeCode]);
 
   const handleCreate = async () => {
-    if (!inputNick.trim()) {
+    const cleanNick = inputNick.trim();
+    if (!cleanNick) {
       useRoomStore.setState({ error: 'Please enter a nickname first.' });
       return;
     }
-    setNickname(inputNick.trim());
+    try { localStorage.setItem('popcorn_saved_nick', cleanNick); } catch { /* ignore */ }
+    setNickname(cleanNick);
     const newCode = await createRoom();
     if (newCode) {
       setInputCode(newCode);
-      const joined = await joinRoom(newCode, inputNick.trim());
+      const joined = await joinRoom(newCode, cleanNick);
       if (joined) onEnterRoom?.();
     }
   };
 
   const handleJoin = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!inputNick.trim()) {
+    const cleanNick = inputNick.trim();
+    if (!cleanNick) {
       useRoomStore.setState({ error: 'Please choose a nickname (1 to 20 characters).' });
       return;
     }
@@ -91,8 +98,9 @@ export function BoxOffice({ initialCode = '', onEnterRoom }: BoxOfficeProps) {
       useRoomStore.setState({ error: 'Please enter a 6-character room code.' });
       return;
     }
-    setNickname(inputNick.trim());
-    const joined = await joinRoom(inputCode.trim(), inputNick.trim());
+    try { localStorage.setItem('popcorn_saved_nick', cleanNick); } catch { /* ignore */ }
+    setNickname(cleanNick);
+    const joined = await joinRoom(inputCode.trim(), cleanNick);
     if (joined) onEnterRoom?.();
   };
 

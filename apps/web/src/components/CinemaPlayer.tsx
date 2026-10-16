@@ -10,6 +10,7 @@ import './CinemaPlayer.css';
 
 interface CinemaPlayerProps {
   source: Source | null;
+  onOpenLobby?: () => void;
 }
 
 /**
@@ -19,7 +20,7 @@ interface CinemaPlayerProps {
  * We show a "Click to watch" overlay that the user must tap — that gesture
  * unblocks autoplay for the entire session.
  */
-export function CinemaPlayer({ source }: CinemaPlayerProps) {
+export function CinemaPlayer({ source, onOpenLobby }: CinemaPlayerProps) {
   const { snapshot, reportDrift } = useRoomStore();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const ytContainerRef = useRef<HTMLDivElement | null>(null);
@@ -92,6 +93,16 @@ export function CinemaPlayer({ source }: CinemaPlayerProps) {
         <div className="player-curtain">
           <p className="player-slate-text">Curtain raised</p>
           <p className="player-slate-sub">Add a film to begin screening</p>
+          {onOpenLobby && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ marginTop: '1.25rem', padding: '0.6rem 1.4rem' }}
+              onClick={onOpenLobby}
+            >
+              🍿 Open Movie Lobby
+            </button>
+          )}
         </div>
       </div>
     );

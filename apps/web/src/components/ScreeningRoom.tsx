@@ -194,7 +194,10 @@ export function ScreeningRoom({ onBackToBoxOffice }: ScreeningRoomProps) {
       {/* Cinema Screen Stage */}
       <main className="screening-stage">
         <div className="screen-frame">
-          <CinemaPlayer source={snapshot.source} />
+          <CinemaPlayer
+            source={snapshot.source}
+            onOpenLobby={() => setIsLobbyOpen(true)}
+          />
         </div>
 
         {/* Playback Controls Chrome */}

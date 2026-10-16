@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Fuse from 'fuse.js';
 import { type Source } from '@popcorn/shared';
 import { useRoomStore } from '../stores/room-store';
@@ -26,7 +26,7 @@ interface LobbyProps {
   onClose: () => void;
 }
 
-// Fallback curated open-domain cinema trailers/films if TMDB key is missing
+// Fallback curated open-domain cinema trailers/films if TMDB key is missing or offline
 const CURATED_CINEMA: MovieItem[] = [
   {
     id: 101,
@@ -82,10 +82,57 @@ const DEFAULT_GENRES: Genre[] = [
   { id: 27, name: 'Horror' },
   { id: 878, name: 'Sci-Fi' },
   { id: 53, name: 'Thriller' },
+  { id: 16, name: 'Animation' },
+  { id: 99, name: 'Documentary' },
 ];
 
+function parseVideoSource(raw: string, customTitle?: string): Source | null {
+  const input = raw.trim();
+  if (!input) return null;
+
+  // YouTube URL or raw 11-char ID
+  const ytMatch = input.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/i
+  );
+  if (ytMatch) {
+    return {
+      kind: 'youtube',
+      ref: ytMatch[1],
+      title: customTitle?.trim() || 'YouTube Screening',
+    };
+  }
+  if (/^[\w-]{11}$/.test(input)) {
+    return {
+      kind: 'youtube',
+      ref: input,
+      title: customTitle?.trim() || 'YouTube Screening',
+    };
+  }
+
+  // HLS stream (.m3u8)
+  if (input.includes('.m3u8')) {
+    return {
+      kind: 'stream',
+      ref: input,
+      title: customTitle?.trim() || 'Live HLS Stream',
+    };
+  }
+
+  // MP4 / WebM / direct web file
+  if (input.startsWith('http://') || input.startsWith('https://')) {
+    return {
+      kind: 'file',
+      ref: input,
+      title: customTitle?.trim() || 'Web Video Film',
+    };
+  }
+
+  return null;
+}
+
 export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
-  const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:4000';
+  const SERVER_URL =
+    (import.meta.env.VITE_SERVER_URL as string | undefined) || window.location.origin;
   const { snapshot } = useRoomStore();
   const isHost = snapshot?.hostId === snapshot?.you;
 
@@ -99,6 +146,13 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [apiNotice, setApiNotice] = useState<string | null>(null);
 
+  // Custom Direct URL State
+  const [directUrl, setDirectUrl] = useState('');
+  const [directTitle, setDirectTitle] = useState('');
+  const [directError, setDirectError] = useState<string | null>(null);
+
+  const searchTimer = useRef<number | null>(null);
+
   // Fetch TMDB genres on mount
   useEffect(() => {
     fetch(`${SERVER_URL}/api/tmdb/genres`)
@@ -108,7 +162,7 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
       })
       .then((data) => {
         if (data.genres && data.genres.length > 0) {
-          setGenres(data.genres.slice(0, 8));
+          setGenres(data.genres.slice(0, 10));
         }
       })
       .catch(() => {
@@ -116,8 +170,43 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
       });
   }, [SERVER_URL]);
 
-  // Fetch discover movies when filters change
+  // Fetch movies: either via active search query or discover filters
   useEffect(() => {
+    if (searchTimer.current) {
+      window.clearTimeout(searchTimer.current);
+    }
+
+    const trimmedQuery = searchQuery.trim();
+
+    if (trimmedQuery.length >= 2) {
+      // Live TMDB Search with 350ms debounce
+      searchTimer.current = window.setTimeout(() => {
+        setIsLoading(true);
+        fetch(`${SERVER_URL}/api/tmdb/search?q=${encodeURIComponent(trimmedQuery)}`)
+          .then((res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+          })
+          .then((data) => {
+            if (data.results && data.results.length > 0) {
+              setMovies(data.results);
+              setFeaturedMovie(data.results[0]);
+              setApiNotice(null);
+            } else {
+              setMovies([]);
+              setApiNotice(`No results found on TMDB for "${trimmedQuery}".`);
+            }
+            setIsLoading(false);
+          })
+          .catch(() => {
+            setApiNotice('Search unavailable. Filtering current catalog.');
+            setIsLoading(false);
+          });
+      }, 350);
+      return;
+    }
+
+    // Discover movies when not searching
     setIsLoading(true);
     const params = new URLSearchParams();
     if (selectedGenre) params.set('genre', String(selectedGenre));
@@ -145,9 +234,9 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
         setFeaturedMovie(CURATED_CINEMA[0]);
         setIsLoading(false);
       });
-  }, [selectedGenre, year, minRating, SERVER_URL]);
+  }, [selectedGenre, year, minRating, searchQuery, SERVER_URL]);
 
-  // Fuse.js fuzzy search over current movie pool
+  // Fuse.js client-side fuzzy search fallback
   const fuse = useMemo(() => {
     return new Fuse(movies, {
       keys: ['title', 'overview'],
@@ -156,6 +245,8 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
   }, [movies]);
 
   const displayedMovies = useMemo(() => {
+    // If TMDB search was used, movies is already the search result
+    if (searchQuery.trim().length >= 2) return movies;
     if (!searchQuery.trim()) return movies;
     return fuse.search(searchQuery.trim()).map((result) => result.item);
   }, [searchQuery, movies, fuse]);
@@ -165,8 +256,10 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
     if (!trailerKey) {
       try {
         const res = await fetch(`${SERVER_URL}/api/tmdb/movie/${movie.id}`);
-        const data = await res.json();
-        trailerKey = data.trailerKey;
+        if (res.ok) {
+          const data = await res.json();
+          trailerKey = data.trailerKey;
+        }
       } catch {
         // fallback
       }
@@ -187,8 +280,10 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
     if (!trailerKey) {
       try {
         const res = await fetch(`${SERVER_URL}/api/tmdb/movie/${movie.id}`);
-        const data = await res.json();
-        trailerKey = data.trailerKey;
+        if (res.ok) {
+          const data = await res.json();
+          trailerKey = data.trailerKey;
+        }
       } catch {
         // fallback
       }
@@ -203,6 +298,30 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
     onAddToPlaylist(source);
   };
 
+  // Direct custom link handlers
+  const handleDirectScreen = () => {
+    setDirectError(null);
+    const parsed = parseVideoSource(directUrl, directTitle);
+    if (!parsed) {
+      setDirectError('Please enter a valid YouTube URL (or ID) or .mp4 / .m3u8 link.');
+      return;
+    }
+    onSelectMovie(parsed);
+    onClose();
+  };
+
+  const handleDirectQueue = () => {
+    setDirectError(null);
+    const parsed = parseVideoSource(directUrl, directTitle);
+    if (!parsed) {
+      setDirectError('Please enter a valid YouTube URL (or ID) or .mp4 / .m3u8 link.');
+      return;
+    }
+    onAddToPlaylist(parsed);
+    setDirectUrl('');
+    setDirectTitle('');
+  };
+
   const posterBase = 'https://image.tmdb.org/t/p/w500';
 
   return (
@@ -212,33 +331,90 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
         <header className="lobby-header">
           <div className="lobby-title-wrap">
             <h2 className="lobby-title">Cinema Lobby</h2>
-            <p className="lobby-subtitle">Discovery and shared programming</p>
+            <p className="lobby-subtitle">TMDB movie discovery & custom video screening</p>
           </div>
-          <button type="button" className="lobby-close-btn" onClick={onClose} aria-label="Close lobby">
+          <button
+            type="button"
+            className="lobby-close-btn"
+            onClick={onClose}
+            aria-label="Close lobby"
+          >
             ✕
           </button>
         </header>
 
         {apiNotice && <div className="lobby-notice">{apiNotice}</div>}
 
-        {/* Filter Bar: Typographic lines for genres + filter inputs */}
+        {/* Direct Link Section: Screen or queue ANY YouTube or video link */}
+        <section className="lobby-direct-box" aria-label="Screen custom video">
+          <h3 className="lobby-section-title">📺 Screen Any Video or YouTube Link</h3>
+          <p className="lobby-section-desc">
+            Paste any YouTube URL, video ID, or direct stream link (.mp4 / .m3u8) to watch together:
+          </p>
+          <div className="lobby-direct-form">
+            <input
+              type="text"
+              placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ or video ID"
+              value={directUrl}
+              onChange={(e) => {
+                setDirectUrl(e.target.value);
+                setDirectError(null);
+              }}
+              className="lobby-direct-input"
+            />
+            <input
+              type="text"
+              placeholder="Title (optional)"
+              value={directTitle}
+              onChange={(e) => setDirectTitle(e.target.value)}
+              className="lobby-direct-title"
+            />
+            <div className="lobby-direct-actions">
+              {isHost && (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleDirectScreen}
+                  disabled={!directUrl.trim()}
+                >
+                  Screen now
+                </button>
+              )}
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleDirectQueue}
+                disabled={!directUrl.trim()}
+              >
+                Add to queue
+              </button>
+            </div>
+          </div>
+          {directError && <p className="lobby-direct-error">{directError}</p>}
+        </section>
+
+        {/* Filter Bar: TMDB Live Search & Genres */}
         <section className="lobby-filters">
+          <h3 className="lobby-section-title">🎬 TMDB Movie Catalog</h3>
           <div className="lobby-search-bar">
             <input
               type="text"
-              placeholder="Fuzzy search titles or keywords..."
+              placeholder="Search any movie in the world (e.g. Inception, Dune, Interstellar)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="lobby-search-input"
             />
-            {isLoading && <span className="lobby-loading-tag">Loading...</span>}
+            {isLoading && <span className="lobby-loading-tag">Searching TMDB...</span>}
           </div>
 
           <div className="lobby-genres-typographic">
             <button
               type="button"
               className={`genre-line-btn ${selectedGenre === null ? 'genre-line-btn--active' : ''}`}
-              onClick={() => setSelectedGenre(null)}
+              onClick={() => {
+                setSelectedGenre(null);
+                setSearchQuery('');
+              }}
             >
               All films
             </button>
@@ -247,7 +423,10 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
                 key={g.id}
                 type="button"
                 className={`genre-line-btn ${selectedGenre === g.id ? 'genre-line-btn--active' : ''}`}
-                onClick={() => setSelectedGenre(selectedGenre === g.id ? null : g.id)}
+                onClick={() => {
+                  setSelectedGenre(selectedGenre === g.id ? null : g.id);
+                  setSearchQuery('');
+                }}
               >
                 {g.name}
               </button>
@@ -306,9 +485,13 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
                 <h3 className="featured-title">{featuredMovie.title}</h3>
                 <p className="featured-overview">{featuredMovie.overview}</p>
                 <div className="featured-meta">
-                  <span className="featured-rating">★ {featuredMovie.vote_average.toFixed(1)}</span>
+                  <span className="featured-rating">
+                    ★ {featuredMovie.vote_average ? featuredMovie.vote_average.toFixed(1) : 'NR'}
+                  </span>
                   {featuredMovie.release_date && (
-                    <span className="featured-year">{featuredMovie.release_date.slice(0, 4)}</span>
+                    <span className="featured-year">
+                      {featuredMovie.release_date.slice(0, 4)}
+                    </span>
                   )}
                 </div>
                 <div className="featured-actions">
@@ -326,7 +509,7 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
                     className="btn btn-secondary"
                     onClick={() => handleQueueMovie(featuredMovie)}
                   >
-                    Add to playlist
+                    Add to queue
                   </button>
                 </div>
               </div>
@@ -336,39 +519,48 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
 
         {/* Horizontal Reel at true 2:3 poster ratio */}
         <section className="lobby-reel-section">
-          <h4 className="reel-title">Horizontal Reel</h4>
-          <div className="lobby-reel">
-            {displayedMovies.map((m) => (
-              <div
-                key={m.id}
-                className="reel-item"
-                onClick={() => setFeaturedMovie(m)}
-                tabIndex={0}
-                role="button"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') setFeaturedMovie(m);
-                }}
-              >
-                <div className="reel-poster-box">
-                  {m.poster_path ? (
-                    <img
-                      src={`${posterBase}${m.poster_path}`}
-                      alt={m.title}
-                      className="reel-poster-img"
-                    />
-                  ) : (
-                    <div className="reel-poster-fallback">
-                      <span className="fallback-title">{m.title}</span>
-                    </div>
-                  )}
+          <h4 className="reel-title">
+            {searchQuery ? `Search Results (${displayedMovies.length})` : 'Popular Films'}
+          </h4>
+          {displayedMovies.length === 0 ? (
+            <p className="reel-empty">No titles match this filter. Try a different search.</p>
+          ) : (
+            <div className="lobby-reel">
+              {displayedMovies.map((m) => (
+                <div
+                  key={m.id}
+                  className="reel-item"
+                  onClick={() => setFeaturedMovie(m)}
+                  tabIndex={0}
+                  role="button"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') setFeaturedMovie(m);
+                  }}
+                >
+                  <div className="reel-poster-box">
+                    {m.poster_path ? (
+                      <img
+                        src={`${posterBase}${m.poster_path}`}
+                        alt={m.title}
+                        className="reel-poster-img"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="reel-poster-fallback">
+                        <span className="fallback-title">{m.title}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="reel-item-info">
+                    <span className="reel-item-title">{m.title}</span>
+                    <span className="reel-item-rating">
+                      ★ {m.vote_average ? m.vote_average.toFixed(1) : 'NR'}
+                    </span>
+                  </div>
                 </div>
-                <div className="reel-item-info">
-                  <span className="reel-item-title">{m.title}</span>
-                  <span className="reel-item-rating">★ {m.vote_average.toFixed(1)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Legal Credit Line */}

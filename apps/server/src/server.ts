@@ -16,7 +16,7 @@ import {
   type ServerToClient,
   type Source,
 } from '@popcorn/shared';
-import { MemoryRoomStore, type RoomStore } from './store/room-store';
+import { MemoryRoomStore, PersistentRoomStore, type RoomStore } from './store/room-store';
 import { RoomManager } from './room-manager';
 import { fetchTMDB, extractTrailerKey } from './tmdb';
 
@@ -29,7 +29,7 @@ function parseCorsOrigins(): string | string[] | null {
 }
 
 export function createServer(customStore?: RoomStore) {
-  const store = customStore ?? new MemoryRoomStore();
+  const store = customStore ?? new PersistentRoomStore();
   const app = express();
   const server = http.createServer(app);
 

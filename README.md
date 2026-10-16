@@ -8,15 +8,17 @@ Popcorn is a real-time synchronized cinema watch-party app. Up to 50 friends joi
 
 ## Features (built)
 
-| ✅ Included | ❌ Not included / planned |
+| ✅ Included | ℹ️ Scope & Enterprise Limitations |
 |---|---|
-| Synchronized YouTube playback | Persistent rooms (in-memory only, resets on redeploy) |
-| Synchronized HTML5 / HLS video | User accounts / profiles |
-| Up to 50 seats per room | Mobile native app |
-| Spoiler-safe chat with video timecodes | Screen share |
-| Emoji reactions burst-animated over seats | DRM-protected streams |
-| TMDB movie discovery & search | Recording / VOD export |
-| Playlist queue with majority-skip voting | P2P / WebRTC fallback |
+| Synchronized YouTube playback | **DRM streams (Netflix, Disney+)**: Hardware-encrypted (Widevine/FairPlay); Popcorn screens YouTube, HLS, MP4 & web cinema |
+| Direct video / stream screening (.mp4, .m3u8, YouTube) | **App Store builds**: Web app runs on mobile browsers; iOS/Android app stores require Apple/Google developer licenses |
+| TMDB world movie catalog discovery & live search | **Cloud VOD recording**: Synchronized live viewing without permanent video disk storage |
+| Persistent rooms (disk-backed JSON store) | |
+| User identity persistence (session & local storage) | |
+| Up to 50 seats per room with silhouette theater | |
+| Spoiler-safe chat with video timecodes | |
+| Emoji reactions burst-animated over seats | |
+| Playlist queue with majority-skip voting | |
 | Single-choice & elimination-bracket polls | |
 | Electron desktop app wrapper | |
 | Clock-sync within 3 ms p95 @ 50 clients | |

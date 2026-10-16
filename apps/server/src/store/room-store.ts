@@ -1,4 +1,6 @@
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   type ChatMessage,
   type ControlMode,
@@ -46,7 +48,7 @@ export function generateRoomCode(): string {
 }
 
 export class MemoryRoomStore implements RoomStore {
-  private rooms = new Map<string, RoomState>();
+  protected rooms = new Map<string, RoomState>();
 
   async createRoom(): Promise<string> {
     let code: string;
@@ -107,5 +109,68 @@ export class MemoryRoomStore implements RoomStore {
 
   async listRooms(): Promise<string[]> {
     return Array.from(this.rooms.keys());
+  }
+}
+
+/**
+ * PersistentRoomStore extends MemoryRoomStore with automatic JSON disk persistence.
+ * Rooms survive server restarts and re-deployments.
+ */
+export class PersistentRoomStore extends MemoryRoomStore {
+  private filePath: string;
+  private saveTimeout: NodeJS.Timeout | null = null;
+
+  constructor(customPath?: string) {
+    super();
+    this.filePath = customPath || path.resolve(process.cwd(), '.popcorn-rooms.json');
+    this.loadFromDisk();
+  }
+
+  private loadFromDisk() {
+    try {
+      if (fs.existsSync(this.filePath)) {
+        const raw = fs.readFileSync(this.filePath, 'utf-8');
+        const data = JSON.parse(raw) as Record<string, RoomState>;
+        for (const [code, room] of Object.entries(data)) {
+          // Reset stale member connections on startup
+          room.members = room.members.map((m) => ({ ...m, connected: false }));
+          this.rooms.set(code.toUpperCase(), room);
+        }
+      }
+    } catch {
+      // Ignore file load error; continue in memory
+    }
+  }
+
+  private scheduleSave() {
+    if (this.saveTimeout) return;
+    this.saveTimeout = setTimeout(() => {
+      this.saveTimeout = null;
+      try {
+        const obj: Record<string, RoomState> = {};
+        for (const [code, room] of this.rooms.entries()) {
+          obj[code] = room;
+        }
+        fs.writeFileSync(this.filePath, JSON.stringify(obj, null, 2), 'utf-8');
+      } catch {
+        // Ignore file write error
+      }
+    }, 1000);
+  }
+
+  override async createRoom(): Promise<string> {
+    const code = await super.createRoom();
+    this.scheduleSave();
+    return code;
+  }
+
+  override async saveRoom(room: RoomState): Promise<void> {
+    await super.saveRoom(room);
+    this.scheduleSave();
+  }
+
+  override async deleteRoom(code: string): Promise<void> {
+    await super.deleteRoom(code);
+    this.scheduleSave();
   }
 }
