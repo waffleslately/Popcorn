@@ -1,6 +1,6 @@
 # 🍿 Popcorn
 
-**[LIVE LINK → https://\<to-fill-after-deploy\>.onrender.com](https://popcorn.onrender.com)**
+**[LIVE LINK → https://popcorn-rm11.onrender.com](https://popcorn-rm11.onrender.com)**
 
 Popcorn is a real-time synchronized cinema watch-party app. Up to 50 friends join a shared room, pick a movie from the built-in TMDB discovery lobby, and watch perfectly in sync — within 3 ms p95 propagation latency. The host controls playback; everyone else sees the exact same frame. Spoiler-safe chat, emoji reactions, a group poll system, and an election-bracket "what to watch next" vote are all included. Hosted on a free tier; **the first load may take up to a minute while the server wakes.**
 
