@@ -419,3 +419,58 @@
   margin: 4px 0 0 0;
 }
 
+.lobby-upload-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: var(--s-3) 0 var(--s-2) 0;
+}
+
+.lobby-upload-divider::before,
+.lobby-upload-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px dashed rgba(237, 241, 245, 0.2);
+}
+
+.lobby-divider-text {
+  padding: 0 var(--s-3);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  color: var(--brass-300, #d4af37);
+  font-weight: 700;
+}
+
+.lobby-device-upload-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+
+.lobby-upload-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: var(--kernel);
+}
+
+.lobby-progress-track {
+  width: 140px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.lobby-progress-fill {
+  height: 100%;
+  background: var(--kernel);
+  border-radius: 3px;
+  transition: width 0.2s ease-out;
+}
+
+

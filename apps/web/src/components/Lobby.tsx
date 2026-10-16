@@ -151,6 +151,12 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
   const [directTitle, setDirectTitle] = useState('');
   const [directError, setDirectError] = useState<string | null>(null);
 
+  // Device file upload state
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState<number>(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   const searchTimer = useRef<number | null>(null);
 
   // Fetch TMDB genres on mount
@@ -322,6 +328,50 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
     setDirectTitle('');
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadPercent(0);
+    setUploadError(null);
+
+    const formData = new FormData();
+    formData.append('video', file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${SERVER_URL}/api/upload`);
+
+    xhr.upload.onprogress = (ev) => {
+      if (ev.lengthComputable) {
+        setUploadPercent(Math.round((ev.loaded / ev.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      setIsUploading(false);
+      if (xhr.status === 201) {
+        const data = JSON.parse(xhr.responseText);
+        const source: Source = {
+          kind: 'file',
+          ref: data.url,
+          title: data.title || file.name,
+        };
+        onSelectMovie(source);
+        onClose();
+      } else {
+        setUploadError('Failed to upload video file. Please try again.');
+      }
+    };
+
+    xhr.onerror = () => {
+      setIsUploading(false);
+      setUploadError('Network error uploading video file.');
+    };
+
+    xhr.send(formData);
+  };
+
   const posterBase = 'https://image.tmdb.org/t/p/w500';
 
   return (
@@ -391,6 +441,41 @@ export function Lobby({ onSelectMovie, onAddToPlaylist, onClose }: LobbyProps) {
             </div>
           </div>
           {directError && <p className="lobby-direct-error">{directError}</p>}
+
+          <div className="lobby-upload-divider">
+            <span className="lobby-divider-text">OR PICK FROM YOUR DEVICE</span>
+          </div>
+
+          <div className="lobby-device-upload-row">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="video/*,.mp4,.webm,.mov,.mkv"
+              style={{ display: 'none' }}
+              onChange={handleFileUpload}
+            />
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+            >
+              📁 Choose Video from Gallery / Storage
+            </button>
+
+            {isUploading && (
+              <div className="lobby-upload-progress">
+                <span>Uploading movie: {uploadPercent}%</span>
+                <div className="lobby-progress-track">
+                  <div
+                    className="lobby-progress-fill"
+                    style={{ width: `${uploadPercent}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          {uploadError && <p className="lobby-direct-error">{uploadError}</p>}
         </section>
 
         {/* Filter Bar: TMDB Live Search & Genres */}

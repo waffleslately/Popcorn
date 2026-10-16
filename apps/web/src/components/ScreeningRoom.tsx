@@ -197,6 +197,7 @@ export function ScreeningRoom({ onBackToBoxOffice }: ScreeningRoomProps) {
           <CinemaPlayer
             source={snapshot.source}
             onOpenLobby={() => setIsLobbyOpen(true)}
+            onSelectSource={(source) => changeSource(source)}
           />
         </div>
 

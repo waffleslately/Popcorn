@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
+import multer from 'multer';
 import { Server as SocketIOServer, type Socket } from 'socket.io';
 import {
   LIMITS,
@@ -48,7 +49,38 @@ export function createServer(customStore?: RoomStore) {
   const candidateA = path.resolve(__dirname, '..', '..', 'web', 'dist');
   const candidateB = path.resolve(process.cwd(), 'apps', 'web', 'dist');
   const webDist = fs.existsSync(candidateA) ? candidateA : candidateB;
+  // ── Uploads & Video streaming ───────────────────────────────────────────
+  const uploadDir = path.resolve(process.cwd(), 'uploads');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
+  const storage = multer.diskStorage({
+    destination: (_req, _file, cb) => {
+      cb(null, uploadDir);
+    },
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname) || '.mp4';
+      const safeBase = path.basename(file.originalname, ext).replace(/[^\w-]/g, '_');
+      const unique = `${Date.now()}-${Math.round(Math.random() * 1e6)}`;
+      cb(null, `${safeBase}-${unique}${ext}`);
+    },
+  });
+
+  const upload = multer({
+    storage,
+    limits: {
+      fileSize: 1024 * 1024 * 1024, // 1 GB max video size
+    },
+  });
+
+  // Serve built web app in production
   app.use(express.static(webDist));
+
+  // Serve uploaded videos with HTTP range support (native to express.static)
+  app.use('/api/videos', express.static(uploadDir, {
+    acceptRanges: true,
+  }));
 
   // Socket.IO Server
   const io = new SocketIOServer<ClientToServer, ServerToClient>(server, {
@@ -134,6 +166,20 @@ export function createServer(customStore?: RoomStore) {
     } catch {
       return res.status(500).json({ error: 'Failed to create room' });
     }
+  });
+
+  // POST /api/upload — upload video from device gallery / disk
+  app.post('/api/upload', upload.single('video'), (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No video file provided' });
+    }
+    const cleanTitle = path.basename(req.file.originalname, path.extname(req.file.originalname));
+    res.status(201).json({
+      url: `/api/videos/${encodeURIComponent(req.file.filename)}`,
+      title: cleanTitle || 'Uploaded Film',
+      filename: req.file.filename,
+      size: req.file.size,
+    });
   });
 
   // GET /api/rooms/:code
