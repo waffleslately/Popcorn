@@ -20,8 +20,10 @@
     "loadtest": "npx tsx scripts/loadtest.ts",
     "lint": "tsc --noEmit --project packages/shared/tsconfig.json && tsc --noEmit --project apps/server/tsconfig.json && tsc --noEmit --project apps/web/tsconfig.json"
   },
+  "dependencies": {
+    "typescript": "^5.6.3"
+  },
   "devDependencies": {
-    "typescript": "^5.6.3",
     "vitest": "^2.1.2"
   }
 }

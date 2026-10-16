@@ -1,5 +1,6 @@
 import http from 'http';
 import path from 'path';
+import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
 import { Server as SocketIOServer, type Socket } from 'socket.io';
@@ -43,8 +44,10 @@ export function createServer(customStore?: RoomStore) {
 
   // ── Static file serving (production) ──────────────────────────────────────
   // Serve the built React app. In production (Render), the web dist is placed
-  // at a known relative path from the compiled server output.
-  const webDist = path.resolve(__dirname, '..', '..', 'web', 'dist');
+  // at a known relative path from the compiled server output or cwd.
+  const candidateA = path.resolve(__dirname, '..', '..', 'web', 'dist');
+  const candidateB = path.resolve(process.cwd(), 'apps', 'web', 'dist');
+  const webDist = fs.existsSync(candidateA) ? candidateA : candidateB;
   app.use(express.static(webDist));
 
   // Socket.IO Server
