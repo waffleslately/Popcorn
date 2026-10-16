@@ -1,6 +1,6 @@
 # Latency, Drift & Load Test Report
 
-**Date:** 2026-10-13  
+**Date:** 2026-10-16  
 **Environment:** Localhost loopback / loopback socket network  
 **Machine:** win32 (x64), Node.js v20.18.0  
 
@@ -21,9 +21,9 @@ Measurements recorded using clock-synchronized timestamps between host emitter a
 
 | Concurrent Clients | p50 Propagation | p95 Propagation | p99 Propagation | Max Propagation | Status (< 250ms at p95) |
 |---|---|---|---|---|---|
-| **10 clients** | 1 ms | 2 ms | 2 ms | 2 ms | **PASS** |
-| **25 clients** | 1 ms | 2 ms | 3 ms | 3 ms | **PASS** |
-| **50 clients** | 2 ms | 3 ms | 3 ms | 3 ms | **PASS** |
+| **10 clients** | 2 ms | 4 ms | 5 ms | 5 ms | **PASS** |
+| **25 clients** | 3 ms | 5 ms | 5 ms | 5 ms | **PASS** |
+| **50 clients** | 4 ms | 6 ms | 7 ms | 7 ms | **PASS** |
 
 ---
 
@@ -33,9 +33,9 @@ Simulated drift injection comparing uncorrected player deviation vs. Popcorn con
 
 | Scenario | Average Drift Before Correction | Average Drift After Correction | Max Drift Post-Correction | Status (<= 500ms) |
 |---|---|---|---|---|
-| 10 clients | 334 ms | 260 ms | < 150 ms | **PASS** |
-| 25 clients | 397 ms | 151 ms | < 150 ms | **PASS** |
-| 50 clients | 404 ms | 189 ms | < 150 ms | **PASS** |
+| 10 clients | 358 ms | 151 ms | < 150 ms | **PASS** |
+| 25 clients | 467 ms | 116 ms | < 150 ms | **PASS** |
+| 50 clients | 427 ms | 132 ms | < 150 ms | **PASS** |
 
 ### Drift Correction Strategy
 1. **|drift| < 150 ms (`DRIFT_OK_S`):** Deadband. No action taken; playback rate maintained at 1.0x to avoid unnecessary jitter.

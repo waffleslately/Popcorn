@@ -1,4 +1,5 @@
-import http from 'node:http';
+import http from 'http';
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import { Server as SocketIOServer, type Socket } from 'socket.io';
@@ -18,26 +19,39 @@ import { MemoryRoomStore, type RoomStore } from './store/room-store';
 import { RoomManager } from './room-manager';
 import { fetchTMDB, extractTrailerKey } from './tmdb';
 
+/** Parse CORS_ORIGIN env (comma-separated list) or fall back to same-origin (null). */
+function parseCorsOrigins(): string | string[] | null {
+  const raw = process.env.CORS_ORIGIN?.trim();
+  if (!raw) return null; // same-origin — no CORS header needed
+  const list = raw.split(',').map((s) => s.trim()).filter(Boolean);
+  return list.length === 1 ? list[0] : list;
+}
+
 export function createServer(customStore?: RoomStore) {
   const store = customStore ?? new MemoryRoomStore();
   const app = express();
   const server = http.createServer(app);
 
-  const webOrigin = process.env.WEB_ORIGIN || 'http://localhost:5173';
-  app.use(
-    cors({
-      origin: webOrigin,
-      credentials: true,
-    })
-  );
+  const corsOrigins = parseCorsOrigins();
+
+  // Only attach CORS middleware when origins are explicitly configured
+  if (corsOrigins) {
+    app.use(cors({ origin: corsOrigins, credentials: true }));
+  }
+
   app.use(express.json());
+
+  // ── Static file serving (production) ──────────────────────────────────────
+  // Serve the built React app. In production (Render), the web dist is placed
+  // at a known relative path from the compiled server output.
+  const webDist = path.resolve(__dirname, '..', '..', 'web', 'dist');
+  app.use(express.static(webDist));
 
   // Socket.IO Server
   const io = new SocketIOServer<ClientToServer, ServerToClient>(server, {
-    cors: {
-      origin: webOrigin,
-      credentials: true,
-    },
+    cors: corsOrigins
+      ? { origin: corsOrigins, credentials: true }
+      : undefined, // same-origin — no CORS config needed
     pingInterval: LIMITS.HEARTBEAT_MS,
     pingTimeout: 10000,
   });
@@ -100,6 +114,11 @@ export function createServer(customStore?: RoomStore) {
 
   /* ---------- REST Endpoints ---------- */
 
+  // GET /health — used by Render's health check
+  app.get('/health', (_req, res) => {
+    res.json({ ok: true, uptime: process.uptime() });
+  });
+
   // POST /api/rooms
   app.post('/api/rooms', async (req, res) => {
     const ip = req.ip || req.socket.remoteAddress || 'unknown';
@@ -134,12 +153,7 @@ export function createServer(customStore?: RoomStore) {
     });
   });
 
-  // GET /health
-  app.get('/health', (_req, res) => {
-    res.json({ ok: true, roomMax: LIMITS.ROOM_MAX });
-  });
-
-  // TMDB Endpoints
+  // TMDB Endpoints — server-side proxy; TMDB_API_KEY never leaves the server
   app.get('/api/tmdb/genres', async (_req, res) => {
     try {
       const data = await fetchTMDB('/genre/movie/list');
@@ -563,25 +577,20 @@ export function createServer(customStore?: RoomStore) {
         if (remaining.length <= 1) {
           poll.status = 'closed';
         } else {
-          // Check if all remaining have equal votes
           const firstVotes = remaining[0].votes.length;
           const allEqual = remaining.every((o) => o.votes.length === firstVotes);
           if (allEqual) {
-            // Joint winners
             poll.status = 'closed';
           } else {
-            // Find lowest voted and eliminate
             let minVotes = Infinity;
             for (const o of remaining) {
               if (o.votes.length < minVotes) minVotes = o.votes.length;
             }
-            // Eliminate lowest
             for (const o of remaining) {
               if (o.votes.length === minVotes) {
                 o.eliminated = true;
               }
             }
-            // Clear votes for next round
             for (const o of poll.options) {
               o.votes = [];
             }
@@ -609,6 +618,20 @@ export function createServer(customStore?: RoomStore) {
       if (code && memberId) {
         await roomManager.handleDisconnect(code, memberId);
       }
+    });
+  });
+
+  // ── SPA Fallback ───────────────────────────────────────────────────────────
+  // Must be AFTER all API routes. Sends index.html for any non-API, non-socket
+  // path so that direct links like /r/ABC123 load the React app.
+  app.get('*', (req, res, next) => {
+    // Let express-static 404s on assets fall through to real 404
+    if (req.path.startsWith('/api/') || req.path === '/health') {
+      return next();
+    }
+    const indexPath = path.join(webDist, 'index.html');
+    res.sendFile(indexPath, (err) => {
+      if (err) next(); // no dist in dev — that's fine
     });
   });
 

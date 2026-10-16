@@ -13,6 +13,13 @@ import {
 } from '@popcorn/shared';
 import { socket, startClockSyncLoop, stopClockSyncLoop, syncClock } from '../lib/socket';
 
+/**
+ * Derive the API base URL the same way socket.ts does:
+ * VITE_SERVER_URL if set, otherwise same-origin.
+ */
+const API_BASE: string =
+  (import.meta.env.VITE_SERVER_URL as string | undefined) || window.location.origin;
+
 interface RoomState {
   code: string;
   nickname: string;
@@ -20,6 +27,8 @@ interface RoomState {
   snapshot: RoomSnapshot | null;
   error: string | null;
   isConnecting: boolean;
+  /** True when the initial connection is taking longer than 3 s */
+  isWakingServer: boolean;
   activeReactions: Reaction[];
   activeWhispers: Array<{ id: string; memberId: string; text: string }>;
 
@@ -38,7 +47,6 @@ interface RoomState {
   initSocketListeners: () => void;
 }
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:4000';
 const SESSION_KEY = 'popcorn_session';
 
 function saveSession(data: { code: string; token: string; nickname: string }) {
@@ -68,6 +76,24 @@ function clearSession() {
 
 let listenersInitialized = false;
 
+/** Timer handle for the "waking server" banner (3 s after connect attempt) */
+let wakingTimer: ReturnType<typeof setTimeout> | null = null;
+
+function startWakingTimer() {
+  if (wakingTimer) return;
+  wakingTimer = setTimeout(() => {
+    useRoomStore.setState({ isWakingServer: true });
+  }, 3000);
+}
+
+function clearWakingTimer() {
+  if (wakingTimer) {
+    clearTimeout(wakingTimer);
+    wakingTimer = null;
+  }
+  useRoomStore.setState({ isWakingServer: false });
+}
+
 export const useRoomStore = create<RoomState>((set, get) => ({
   code: '',
   nickname: '',
@@ -75,6 +101,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
   snapshot: null,
   error: null,
   isConnecting: false,
+  isWakingServer: false,
   activeReactions: [],
   activeWhispers: [],
 
@@ -85,6 +112,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
     listenersInitialized = true;
 
     socket.on('connect', async () => {
+      clearWakingTimer();
       const { code, token, nickname } = get();
       if (code && token && nickname) {
         // Reconnect with existing token
@@ -196,7 +224,6 @@ export const useRoomStore = create<RoomState>((set, get) => ({
       set((s) => ({
         activeReactions: [...s.activeReactions, reaction],
       }));
-      // Remove reaction after 3.5s
       setTimeout(() => {
         set((s) => ({
           activeReactions: s.activeReactions.filter((r) => r.id !== reaction.id),
@@ -209,6 +236,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
     if (saved && saved.code && saved.token) {
       set({ code: saved.code, token: saved.token, nickname: saved.nickname });
       if (!socket.connected) {
+        startWakingTimer();
         socket.connect();
       }
     }
@@ -217,7 +245,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
   createRoom: async () => {
     set({ isConnecting: true, error: null });
     try {
-      const res = await fetch(`${SERVER_URL}/api/rooms`, {
+      const res = await fetch(`${API_BASE}/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -250,6 +278,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
     set({ isConnecting: true, error: null });
 
     if (!socket.connected) {
+      startWakingTimer();
       socket.connect();
     }
 
@@ -259,6 +288,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
         'room:join',
         { code: cleanCode, nickname: cleanNick, token: existingToken || undefined },
         (res: JoinResult) => {
+          clearWakingTimer();
           set({ isConnecting: false });
           if (!res.ok) {
             const err = getFriendlyErrorMessage(res.error);
@@ -290,6 +320,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
   },
 
   leaveRoom: () => {
+    clearWakingTimer();
     stopClockSyncLoop();
     clearSession();
     if (socket.connected) {
@@ -301,6 +332,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
       snapshot: null,
       error: null,
       activeReactions: [],
+      isWakingServer: false,
     });
   },
 

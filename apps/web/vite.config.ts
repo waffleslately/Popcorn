@@ -1,8 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      // Point Vite directly at the TS source so it doesn't hit the CJS dist
+      '@popcorn/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
+    },
+  },
   server: {
     port: 5173,
     host: true
@@ -24,7 +31,7 @@ export default defineConfig({
         }
       }
     },
-    // Raise the warning threshold slightly since we now split chunks
-    chunkSizeWarningLimit: 300
+    // hls.js is a full media library (~186 kB gzipped); suppress the warning
+    chunkSizeWarningLimit: 600
   }
 });

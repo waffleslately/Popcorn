@@ -7,14 +7,24 @@ import {
   type ServerToClient,
 } from '@popcorn/shared';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:4000';
+/**
+ * Resolve the server base URL:
+ *  - VITE_SERVER_URL env var (set at build time for production builds pointed elsewhere)
+ *  - Otherwise same-origin (window.location.origin), which works when the
+ *    Express server serves both the static files AND the socket endpoint.
+ */
+const SERVER_URL: string =
+  (import.meta.env.VITE_SERVER_URL as string | undefined) || '';
 
-export const socket: Socket<ServerToClient, ClientToServer> = io(SERVER_URL, {
-  autoConnect: false,
-  reconnection: true,
-  reconnectionAttempts: Infinity,
-  reconnectionDelay: 1000,
-});
+export const socket: Socket<ServerToClient, ClientToServer> = io(
+  SERVER_URL || undefined!, // empty string → same-origin
+  {
+    autoConnect: false,
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+  }
+);
 
 let clockSyncInterval: number | null = null;
 let currentOffset = 0;

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: popcorn
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: TMDB_API_KEY
+        sync: false        # set manually in the Render dashboard
+      - key: CORS_ORIGIN
+        value: ""          # same-origin — server serves the frontend

@@ -33,19 +33,20 @@ export function BoxOffice({ initialCode = '', onEnterRoom }: BoxOfficeProps) {
   } | null>(null);
 
   const activeCode = (snapshot?.code || inputCode).toUpperCase();
-  const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:4000';
+  const API_BASE: string =
+    (import.meta.env.VITE_SERVER_URL as string | undefined) || window.location.origin;
 
   // Fetch room info if code is 6 characters
   useEffect(() => {
     if (activeCode.length === 6) {
-      fetch(`${SERVER_URL}/api/rooms/${activeCode}`)
+      fetch(`${API_BASE}/api/rooms/${activeCode}`)
         .then((r) => r.json())
         .then((data) => setRoomInfo(data))
         .catch(() => setRoomInfo(null));
     } else {
       setRoomInfo(null);
     }
-  }, [activeCode, SERVER_URL]);
+  }, [activeCode, API_BASE]);
 
   // Generate QR code for the active room link
   useEffect(() => {
