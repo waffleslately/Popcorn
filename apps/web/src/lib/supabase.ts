@@ -1,13 +1,29 @@
 import { createClient } from '@supabase/supabase-js';
 
-const url = import.meta.env.VITE_SUPABASE_URL as string;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const rawUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim();
+const rawKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim();
 
-if (!url || !anonKey) {
-  console.warn(
-    '[Popcorn] Supabase env vars missing — auth features will be unavailable. ' +
-      'Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local.'
+export const isSupabaseConfigured = Boolean(
+  rawUrl &&
+  rawKey &&
+  rawUrl !== 'https://placeholder.supabase.co' &&
+  !rawUrl.includes('your-project')
+);
+
+if (!isSupabaseConfigured) {
+  console.info(
+    '[Popcorn] Supabase credentials not configured. Guest mode is fully operational.'
   );
 }
 
-export const supabase = createClient(url ?? '', anonKey ?? '');
+// Fallback to a valid format dummy URL so createClient does not throw on import
+export const supabase = createClient(
+  isSupabaseConfigured ? rawUrl! : 'https://placeholder.supabase.co',
+  isSupabaseConfigured ? rawKey! : 'placeholder-anon-key',
+  {
+    auth: {
+      persistSession: isSupabaseConfigured,
+      autoRefreshToken: isSupabaseConfigured,
+    },
+  }
+);

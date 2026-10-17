@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Session, User } from '@supabase/supabase-js';
 
 export interface Profile {
@@ -30,6 +30,7 @@ interface AuthState {
 }
 
 async function fetchProfile(userId: string): Promise<Profile | null> {
+  if (!isSupabaseConfigured) return null;
   const { data, error } = await supabase
     .from('profiles')
     .select('id, username, display_name, avatar_url, bio, is_private')
@@ -53,6 +54,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   initAuth: () => {
+    if (!isSupabaseConfigured) {
+      set({ loading: false });
+      return;
+    }
+
     // Get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       const profile = session ? await fetchProfile(session.user.id) : null;
@@ -67,6 +73,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signInWithMagicLink: async (email: string) => {
+    if (!isSupabaseConfigured) {
+      const msg = 'Supabase credentials are not configured yet on this deployment.';
+      set({ error: msg });
+      return { error: msg };
+    }
     set({ error: null });
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -80,6 +91,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signInWithGoogle: async () => {
+    if (!isSupabaseConfigured) {
+      const msg = 'Supabase credentials are not configured yet on this deployment.';
+      set({ error: msg });
+      return { error: msg };
+    }
     set({ error: null });
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
