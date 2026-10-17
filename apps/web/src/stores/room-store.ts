@@ -12,6 +12,7 @@ import {
   type Source,
 } from '@popcorn/shared';
 import { socket, startClockSyncLoop, stopClockSyncLoop, syncClock } from '../lib/socket';
+import { useAuthStore } from './auth-store';
 
 /**
  * Derive the API base URL the same way socket.ts does:
@@ -264,7 +265,8 @@ export const useRoomStore = create<RoomState>((set, get) => ({
 
   joinRoom: async (code: string, nickname: string) => {
     const cleanCode = code.trim().toUpperCase();
-    const cleanNick = nickname.trim();
+    const profileName = useAuthStore.getState().displayName();
+    const cleanNick = (profileName || nickname || '').trim();
 
     if (!cleanCode) {
       set({ error: 'Please enter a 6-character room code.' });

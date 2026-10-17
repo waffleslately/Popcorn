@@ -1,0 +1,85 @@
+/* FeedPage */
+.feed-root {
+  min-height: 100vh;
+  background: var(--beam);
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding: var(--s-8) var(--s-4);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.feed-title {
+  font-family: var(--font-display);
+  font-size: var(--t-xl);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--s-6);
+}
+
+.feed-empty {
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
+  font-size: var(--t-sm);
+}
+
+.feed-item {
+  padding: var(--s-4) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.feed-item-header {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: var(--t-sm);
+  margin-bottom: var(--s-2);
+}
+
+.feed-username {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.feed-meta { color: color-mix(in srgb, var(--ink) 55%, transparent); }
+
+.feed-film-link {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: var(--velvet);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.feed-rating { color: var(--brass); }
+
+.feed-date {
+  margin-left: auto;
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 45%, transparent);
+}
+
+.feed-body {
+  font-size: var(--t-md);
+  line-height: var(--lh-body);
+  margin: 0;
+}
+
+.feed-tmdb-footer {
+  margin-top: var(--s-12);
+  padding-top: var(--s-4);
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 40%, transparent);
+  text-align: center;
+}

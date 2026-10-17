@@ -1,0 +1,230 @@
+/* FilmPage — beam paper + ink, no gradients */
+.fp-root {
+  min-height: 100vh;
+  background: var(--beam);
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding: var(--s-6) var(--s-4);
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.fp-loading {
+  min-height: 100vh;
+  background: var(--beam);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+}
+
+.fp-back {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: var(--s-6);
+  display: block;
+}
+.fp-back:hover { color: var(--ink); }
+
+.fp-hero {
+  display: flex;
+  gap: var(--s-6);
+  margin-bottom: var(--s-8);
+}
+
+.fp-poster {
+  width: 160px;
+  flex-shrink: 0;
+  display: block;
+  object-fit: cover;
+}
+
+.fp-info { flex: 1; }
+
+.fp-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0 0 var(--s-1);
+}
+
+.fp-year, .fp-genres {
+  font-size: var(--t-sm);
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+  margin: 0 0 var(--s-2);
+}
+
+.fp-overview {
+  font-size: var(--t-md);
+  line-height: var(--lh-body);
+  margin: var(--s-3) 0 var(--s-4);
+}
+
+.fp-actions { display: flex; gap: var(--s-3); align-items: center; flex-wrap: wrap; }
+
+.fp-watchlist-btn {
+  padding: 0.5rem var(--s-4);
+  border: 1.5px solid var(--ink);
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  cursor: pointer;
+  transition: all var(--d-fast) var(--ease);
+}
+.fp-watchlist-btn:hover { background: var(--ink); color: var(--beam); }
+.fp-watchlist-btn--active { background: var(--ink); color: var(--beam); }
+
+.fp-my-rating { font-size: var(--t-sm); color: var(--brass); }
+
+.fp-section-title {
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--s-4);
+  padding-bottom: var(--s-2);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+}
+
+/* Review form */
+.fp-review-form-section {
+  margin-bottom: var(--s-8);
+}
+
+.fp-review-form { display: flex; flex-direction: column; gap: var(--s-3); }
+
+.fp-rating-row { display: flex; gap: 2px; flex-wrap: wrap; align-items: center; }
+
+.fp-star-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--ink) 25%, transparent);
+  padding: 2px;
+  transition: color var(--d-fast) var(--ease);
+}
+.fp-star-btn:hover, .fp-star-btn--active { color: var(--brass); }
+
+.fp-clear-rating {
+  background: none;
+  border: none;
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 40%, transparent);
+  cursor: pointer;
+  margin-left: var(--s-2);
+}
+
+.fp-review-textarea {
+  width: 100%;
+  padding: var(--s-3);
+  border: 1.5px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  background: var(--beam);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  line-height: var(--lh-body);
+  resize: vertical;
+  box-sizing: border-box;
+}
+.fp-review-textarea:focus { outline: 2px solid var(--brass); border-color: var(--brass); }
+
+.fp-spoiler-label {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  font-size: var(--t-sm);
+  cursor: pointer;
+}
+
+.fp-submit-btn {
+  align-self: flex-start;
+  padding: 0.6rem var(--s-6);
+  background: var(--velvet);
+  color: var(--beam);
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--d-fast) var(--ease);
+}
+.fp-submit-btn:hover { background: var(--velvet-deep); }
+.fp-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Reviews list */
+.fp-reviews-section { margin-bottom: var(--s-8); }
+
+.fp-review-card {
+  padding: var(--s-4) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.fp-review-header {
+  display: flex;
+  gap: var(--s-3);
+  align-items: center;
+  margin-bottom: var(--s-2);
+  font-size: var(--t-sm);
+  flex-wrap: wrap;
+}
+
+.fp-reviewer { font-weight: 500; }
+.fp-review-stars { color: var(--brass); }
+
+.fp-spoiler-tag {
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--kernel);
+  color: var(--ink);
+  padding: 0.1rem var(--s-2);
+}
+
+.fp-report-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 40%, transparent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.fp-report-btn:hover { color: var(--velvet); }
+
+.fp-reported-note {
+  margin-left: auto;
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 40%, transparent);
+}
+
+.fp-review-body {
+  font-size: var(--t-md);
+  line-height: var(--lh-body);
+  margin: 0;
+}
+
+.fp-empty {
+  color: color-mix(in srgb, var(--ink) 45%, transparent);
+  font-size: var(--t-sm);
+  padding: var(--s-4) 0;
+}
+
+.fp-tmdb-footer {
+  margin-top: var(--s-12);
+  padding-top: var(--s-4);
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 40%, transparent);
+  text-align: center;
+}

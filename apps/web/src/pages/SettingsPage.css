@@ -1,0 +1,158 @@
+/* SettingsPage */
+.settings-root {
+  min-height: 100vh;
+  background: var(--beam);
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding: var(--s-8) var(--s-4);
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.settings-back {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: var(--s-6);
+  display: block;
+}
+.settings-back:hover { color: var(--ink); }
+
+.settings-title {
+  font-family: var(--font-display);
+  font-size: var(--t-xl);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--s-6);
+}
+
+.settings-form { display: flex; flex-direction: column; gap: var(--s-4); margin-bottom: var(--s-8); }
+
+.settings-group { display: flex; flex-direction: column; gap: var(--s-2); }
+
+.settings-label { font-size: var(--t-sm); font-weight: 500; }
+
+.settings-input,
+.settings-textarea {
+  padding: var(--s-3);
+  border: 1.5px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  background: var(--beam);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  box-sizing: border-box;
+  width: 100%;
+}
+.settings-input:focus,
+.settings-textarea:focus { outline: 2px solid var(--brass); border-color: var(--brass); }
+.settings-textarea { resize: vertical; line-height: var(--lh-body); }
+
+.settings-toggle {
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-start;
+  font-size: var(--t-sm);
+  cursor: pointer;
+  line-height: var(--lh-body);
+}
+
+.settings-btn-save {
+  align-self: flex-start;
+  padding: 0.6rem var(--s-6);
+  background: var(--velvet);
+  color: var(--beam);
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--d-fast) var(--ease);
+}
+.settings-btn-save:hover { background: var(--velvet-deep); }
+.settings-btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.settings-msg { font-size: var(--t-sm); color: var(--velvet); }
+.settings-msg--error { color: #c0392b; }
+
+/* Danger zone */
+.settings-danger-zone {
+  padding: var(--s-6);
+  border: 1.5px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  margin-bottom: var(--s-6);
+}
+
+.settings-danger-title {
+  font-family: var(--font-display);
+  font-size: var(--t-md);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 var(--s-4);
+}
+
+.settings-btn-delete {
+  background: none;
+  border: 1.5px solid #c0392b;
+  color: #c0392b;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  padding: 0.5rem var(--s-4);
+  cursor: pointer;
+  transition: all var(--d-fast) var(--ease);
+}
+.settings-btn-delete:hover { background: #c0392b; color: #fff; }
+
+.settings-delete-confirm p {
+  font-size: var(--t-sm);
+  line-height: var(--lh-body);
+  margin: 0 0 var(--s-4);
+}
+
+.settings-delete-actions { display: flex; gap: var(--s-3); flex-wrap: wrap; }
+
+.settings-btn-delete-confirm {
+  padding: 0.5rem var(--s-4);
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  cursor: pointer;
+}
+.settings-btn-delete-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.settings-btn-cancel {
+  padding: 0.5rem var(--s-4);
+  background: none;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  cursor: pointer;
+}
+
+.settings-btn-signout {
+  display: block;
+  width: 100%;
+  padding: 0.7rem;
+  background: none;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  cursor: pointer;
+  margin-bottom: var(--s-8);
+  transition: background var(--d-fast) var(--ease);
+}
+.settings-btn-signout:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+
+.settings-tmdb-footer {
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 40%, transparent);
+  text-align: center;
+  padding-top: var(--s-4);
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+}

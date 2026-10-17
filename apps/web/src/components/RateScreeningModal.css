@@ -1,0 +1,124 @@
+/* RateScreeningModal — beam paper dialog */
+.rate-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 8500;
+  background: color-mix(in srgb, var(--pit) 85%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-4);
+  backdrop-filter: blur(4px);
+}
+
+.rate-modal {
+  position: relative;
+  background: var(--beam);
+  color: var(--ink);
+  max-width: 420px;
+  width: 100%;
+  padding: var(--s-8);
+  font-family: var(--font-body);
+  text-align: center;
+}
+
+.rate-close {
+  position: absolute;
+  top: var(--s-4);
+  right: var(--s-4);
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 0.6;
+}
+.rate-close:hover { opacity: 1; }
+
+.rate-title {
+  font-family: var(--font-display);
+  font-size: var(--t-xl);
+  text-transform: uppercase;
+  margin: 0 0 var(--s-2);
+}
+
+.rate-movie {
+  font-size: var(--t-md);
+  font-weight: 600;
+  margin: 0 0 var(--s-1);
+}
+
+.rate-room-badge {
+  display: inline-block;
+  font-size: var(--t-xs);
+  color: var(--velvet);
+  margin-bottom: var(--s-6);
+}
+
+.rate-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.rate-stars-row {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+}
+
+.rate-star-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--ink) 25%, transparent);
+  padding: 2px;
+  transition: color var(--d-fast) var(--ease);
+}
+.rate-star-btn:hover,
+.rate-star-btn--active {
+  color: var(--brass);
+}
+
+.rate-selected-text {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--brass);
+}
+
+.rate-actions {
+  display: flex;
+  gap: var(--s-3);
+  margin-top: var(--s-2);
+}
+
+.rate-btn-submit {
+  padding: 0.5rem var(--s-6);
+  background: var(--velvet);
+  color: var(--beam);
+  border: none;
+  font-size: var(--t-sm);
+  cursor: pointer;
+}
+.rate-btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rate-btn-skip {
+  padding: 0.5rem var(--s-4);
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  color: var(--ink);
+  font-size: var(--t-sm);
+  cursor: pointer;
+}
+
+.rate-success {
+  font-size: var(--t-md);
+  color: #27ae60;
+  font-weight: 500;
+  margin: var(--s-4) 0;
+}

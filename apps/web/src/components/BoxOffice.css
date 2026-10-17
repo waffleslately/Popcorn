@@ -12,7 +12,74 @@
 .boxoffice-header {
   text-align: center;
   margin-bottom: var(--s-8);
-  max-width: 600px;
+  max-width: 680px;
+  width: 100%;
+}
+
+.boxoffice-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: var(--s-8);
+  padding-bottom: var(--s-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--beam) 15%, transparent);
+}
+
+.boxoffice-nav-links,
+.boxoffice-auth-links {
+  display: flex;
+  gap: var(--s-3);
+  align-items: center;
+}
+
+.boxoffice-nav-btn {
+  background: none;
+  border: none;
+  color: var(--beam);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  cursor: pointer;
+  padding: var(--s-1) var(--s-2);
+  opacity: 0.8;
+  transition: opacity var(--d-fast) var(--ease);
+}
+.boxoffice-nav-btn:hover {
+  opacity: 1;
+}
+
+.boxoffice-user-btn {
+  background: none;
+  border: none;
+  color: var(--kernel);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  cursor: pointer;
+  padding: var(--s-1) var(--s-2);
+}
+
+.boxoffice-signin-btn {
+  background: var(--brass);
+  color: var(--pit);
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.35rem var(--s-3);
+  cursor: pointer;
+}
+.boxoffice-signin-btn:hover {
+  background: var(--kernel);
+}
+
+.boxoffice-tmdb-footer {
+  margin-top: var(--s-12);
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--beam) 40%, transparent);
+  text-align: center;
 }
 
 .boxoffice-title {
