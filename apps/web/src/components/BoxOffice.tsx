@@ -2,14 +2,22 @@ import React, { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import { LIMITS } from '@popcorn/shared';
 import { useRoomStore } from '../stores/room-store';
+import { useAuthStore } from '../stores/auth-store';
 import './BoxOffice.css';
 
 interface BoxOfficeProps {
   initialCode?: string;
   onEnterRoom?: () => void;
+  onNavigate?: (route: string) => void;
+  onOpenAuth?: () => void;
 }
 
-export function BoxOffice({ initialCode = '', onEnterRoom }: BoxOfficeProps) {
+export function BoxOffice({
+  initialCode = '',
+  onEnterRoom,
+  onNavigate,
+  onOpenAuth,
+}: BoxOfficeProps) {
   const {
     code: storeCode,
     nickname,
@@ -21,12 +29,28 @@ export function BoxOffice({ initialCode = '', onEnterRoom }: BoxOfficeProps) {
     snapshot,
   } = useRoomStore();
 
+  const { user, profile } = useAuthStore();
+
   const [inputCode, setInputCode] = useState(initialCode || storeCode);
   const [inputNick, setInputNick] = useState(
-    nickname || (() => {
-      try { return localStorage.getItem('popcorn_saved_nick') || ''; } catch { return ''; }
-    })()
+    nickname ||
+      profile?.display_name ||
+      profile?.username ||
+      (() => {
+        try {
+          return localStorage.getItem('popcorn_saved_nick') || '';
+        } catch {
+          return '';
+        }
+      })()
   );
+
+  useEffect(() => {
+    if (profile && !nickname) {
+      const preferred = profile.display_name || profile.username;
+      if (preferred) setInputNick(preferred);
+    }
+  }, [profile, nickname]);
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copyFeedback, setCopyFeedback] = useState<string>('');
   const [roomInfo, setRoomInfo] = useState<{
@@ -116,6 +140,51 @@ export function BoxOffice({ initialCode = '', onEnterRoom }: BoxOfficeProps) {
   return (
     <div className="boxoffice-root">
       <header className="boxoffice-header">
+        <div className="boxoffice-topbar">
+          <div className="boxoffice-nav-links">
+            <button type="button" className="boxoffice-nav-btn" onClick={() => onNavigate?.('/diary')}>
+              Diary
+            </button>
+            <button type="button" className="boxoffice-nav-btn" onClick={() => onNavigate?.('/lists')}>
+              Lists
+            </button>
+            <button type="button" className="boxoffice-nav-btn" onClick={() => onNavigate?.('/feed')}>
+              Feed
+            </button>
+            <button type="button" className="boxoffice-nav-btn" onClick={() => onNavigate?.('/import')}>
+              Import
+            </button>
+          </div>
+          <div className="boxoffice-auth-links">
+            {user && profile ? (
+              <>
+                <button
+                  type="button"
+                  className="boxoffice-user-btn"
+                  onClick={() => onNavigate?.(`/u/${profile.username}`)}
+                >
+                  @{profile.username}
+                </button>
+                <button
+                  type="button"
+                  className="boxoffice-nav-btn"
+                  onClick={() => onNavigate?.('/settings')}
+                >
+                  Settings
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                className="boxoffice-signin-btn"
+                onClick={onOpenAuth}
+              >
+                Sign In
+              </button>
+            )}
+          </div>
+        </div>
+
         <h1 className="boxoffice-title">Box office</h1>
         <p className="boxoffice-subtitle">
           Real-time cinema watch-party. Enter with a ticket or admit guests.
@@ -261,6 +330,10 @@ export function BoxOffice({ initialCode = '', onEnterRoom }: BoxOfficeProps) {
           )}
         </section>
       </div>
+
+      <footer className="boxoffice-tmdb-footer">
+        This product uses the TMDB API but is not endorsed or certified by TMDB.
+      </footer>
     </div>
   );
 }

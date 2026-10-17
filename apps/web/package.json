@@ -11,19 +11,20 @@
   },
   "dependencies": {
     "@popcorn/shared": "*",
+    "@supabase/supabase-js": "^2.109.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
     "fuse.js": "^7.0.0",
     "hls.js": "^1.5.15",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "socket.io-client": "^4.8.0",
-    "zustand": "^5.0.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.8",
-    "@vitejs/plugin-react": "^4.3.2",
-    "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.0",
-    "@types/qrcode": "^1.5.5"
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "vitest": "^2.1.2"

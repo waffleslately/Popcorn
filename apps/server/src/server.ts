@@ -260,6 +260,58 @@ export function createServer(customStore?: RoomStore) {
     }
   });
 
+  // DELETE /api/auth/delete-account — deletes user via Supabase admin API
+  app.delete('/api/auth/delete-account', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing bearer authorization header' });
+    }
+    const token = authHeader.split(' ')[1];
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      return res.status(501).json({
+        error: 'SUPABASE_SERVICE_ROLE_KEY not configured on server',
+      });
+    }
+
+    try {
+      // 1. Verify token by querying Supabase Auth getUser endpoint
+      const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          apikey: serviceRoleKey,
+        },
+      });
+      if (!userRes.ok) {
+        return res.status(401).json({ error: 'Invalid or expired user session' });
+      }
+      const userData = (await userRes.json()) as { id: string };
+
+      // 2. Delete user via admin API — cascades to all DB tables
+      const deleteRes = await fetch(
+        `${supabaseUrl}/auth/v1/admin/users/${userData.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${serviceRoleKey}`,
+            apikey: serviceRoleKey,
+          },
+        }
+      );
+
+      if (!deleteRes.ok) {
+        const errBody: any = await deleteRes.json().catch(() => ({}));
+        return res.status(500).json({ error: errBody.msg || 'Failed to delete user' });
+      }
+
+      return res.json({ ok: true });
+    } catch (err: any) {
+      return res.status(500).json({ error: err.message || 'Internal server error' });
+    }
+  });
+
   /* ---------- Socket.IO Handlers ---------- */
 
   io.on('connection', (socket: Socket<ClientToServer, ServerToClient>) => {

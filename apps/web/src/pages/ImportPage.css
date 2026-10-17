@@ -1,0 +1,186 @@
+/* ImportPage — beam paper + ink styling */
+.import-root {
+  min-height: 100vh;
+  background: var(--beam);
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding: var(--s-8) var(--s-4);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.import-back {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: var(--s-6);
+  display: block;
+}
+.import-back:hover {
+  color: var(--ink);
+}
+
+.import-title {
+  font-family: var(--font-display);
+  font-size: var(--t-xl);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--s-2);
+}
+
+.import-sub {
+  font-size: var(--t-sm);
+  color: color-mix(in srgb, var(--ink) 75%, transparent);
+  line-height: var(--lh-body);
+  margin-bottom: var(--s-6);
+}
+
+.import-warning {
+  padding: var(--s-4);
+  background: color-mix(in srgb, var(--velvet) 10%, transparent);
+  color: var(--velvet);
+  font-size: var(--t-sm);
+  margin-bottom: var(--s-6);
+}
+
+.import-upload-zone {
+  margin-bottom: var(--s-6);
+}
+
+.import-file-label {
+  display: inline-block;
+  padding: 0.6rem var(--s-6);
+  background: var(--velvet);
+  color: var(--beam);
+  cursor: pointer;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  transition: background var(--d-fast) var(--ease);
+}
+.import-file-label:hover {
+  background: var(--velvet-deep);
+}
+
+.import-file-input {
+  display: none;
+}
+
+.import-matching-banner {
+  padding: var(--s-3) var(--s-4);
+  background: color-mix(in srgb, var(--brass) 15%, transparent);
+  color: var(--ink);
+  font-size: var(--t-sm);
+  margin-bottom: var(--s-6);
+}
+
+.import-preview-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.import-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+
+.import-preview-header h2 {
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  margin: 0;
+}
+
+.import-counts {
+  display: flex;
+  gap: var(--s-4);
+  font-size: var(--t-sm);
+}
+
+.count-matched {
+  color: #27ae60;
+  font-weight: 500;
+}
+
+.count-unmatched {
+  color: #c0392b;
+  font-weight: 500;
+}
+
+.import-btn-start {
+  padding: 0.5rem var(--s-5);
+  background: var(--velvet);
+  color: var(--beam);
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  cursor: pointer;
+}
+.import-btn-start:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.import-success-box {
+  padding: var(--s-4);
+  background: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+  font-size: var(--t-sm);
+}
+
+.import-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+}
+
+.import-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-xs);
+  text-align: left;
+}
+
+.import-table th {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  padding: var(--s-2) var(--s-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+  font-weight: 600;
+}
+
+.import-table td {
+  padding: var(--s-2) var(--s-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.row-matched td:first-child {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.row-unmatched td:first-child {
+  color: #c0392b;
+  font-weight: bold;
+}
+
+.import-more-rows {
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
+  padding: var(--s-2) var(--s-3);
+  margin: 0;
+}
+
+.import-tmdb-footer {
+  margin-top: var(--s-12);
+  padding-top: var(--s-4);
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 40%, transparent);
+  text-align: center;
+}

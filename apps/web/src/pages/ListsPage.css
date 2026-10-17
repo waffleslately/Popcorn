@@ -1,0 +1,203 @@
+/* ListsPage — beam paper + ink styling */
+.lists-root {
+  min-height: 100vh;
+  background: var(--beam);
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding: var(--s-8) var(--s-4);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.lists-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--s-6);
+}
+
+.lists-title {
+  font-family: var(--font-display);
+  font-size: var(--t-xl);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.lists-btn-create {
+  background: var(--velvet);
+  color: var(--beam);
+  border: none;
+  border-radius: var(--r-cut);
+  padding: 0.4rem var(--s-4);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  cursor: pointer;
+}
+.lists-btn-create:hover {
+  background: var(--velvet-deep);
+}
+
+.lists-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+  margin-bottom: var(--s-6);
+}
+
+.lists-input,
+.lists-textarea {
+  padding: var(--s-3);
+  border: 1.5px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  background: var(--beam);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  box-sizing: border-box;
+  width: 100%;
+}
+.lists-input:focus,
+.lists-textarea:focus {
+  outline: 2px solid var(--brass);
+  border-color: var(--brass);
+}
+
+.lists-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--t-sm);
+  cursor: pointer;
+}
+
+.lists-btn-submit {
+  align-self: flex-start;
+  padding: 0.5rem var(--s-4);
+  background: var(--velvet);
+  color: var(--beam);
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  cursor: pointer;
+}
+.lists-btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lists-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.lists-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--s-4) var(--s-2);
+  background: none;
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  color: var(--ink);
+  transition: background var(--d-fast) var(--ease);
+}
+.lists-row:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+.lists-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
+
+.lists-row-title {
+  font-weight: 600;
+  font-size: var(--t-md);
+}
+
+.lists-row-desc {
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+}
+
+.lists-row-tag {
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px var(--s-2);
+  border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  color: color-mix(in srgb, var(--ink) 70%, transparent);
+}
+
+.lists-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.lists-back-btn {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  font-size: var(--t-sm);
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+  cursor: pointer;
+  padding: 0;
+}
+.lists-back-btn:hover {
+  color: var(--ink);
+}
+
+.lists-detail-title {
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  margin: 0;
+}
+
+.lists-detail-desc {
+  font-size: var(--t-sm);
+  color: color-mix(in srgb, var(--ink) 70%, transparent);
+  margin: 0;
+}
+
+.lists-items-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.lists-film-card {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--s-3);
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  cursor: pointer;
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+.lists-film-card:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+.lists-empty {
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
+  font-size: var(--t-sm);
+  padding: var(--s-4) 0;
+}
+
+.lists-tmdb-footer {
+  margin-top: var(--s-12);
+  padding-top: var(--s-4);
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--ink) 40%, transparent);
+  text-align: center;
+}
